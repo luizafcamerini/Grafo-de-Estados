@@ -4,7 +4,7 @@ def calculaQuadrantesAdj(posicao):
         Funcao que, dado um quadrante do tabuleiro, retorna todos os quadrantes adjacentes 
         ao mesmo dentro do vetor de config.
     ''' 
-    quadrante = posicao + 1 #=>o quadrante do tabuleiro eh a posicao do vetor + 1
+    quadrante = posicao + 1 # => o quadrante do tabuleiro eh a posicao do vetor + 1
     match (quadrante):
         case 1: return [1, 3]
         case 2: return [0, 4, 2]
@@ -19,20 +19,28 @@ def calculaQuadrantesAdj(posicao):
 
 
 def calculaConfigsAdj(config):
+    '''
+        Funcao que retorna uma lista de configuracoes adjacentes a uma configuracao dada.
+    '''
     lista_adjacentes = list()
+    # Calcula os quadrantes adjacentes ao vazio:
     lista_quadrantes = calculaQuadrantesAdj(config.index('*'))
+    # Para cada quadrante adjacente, cria uma config nova o trocando de lugar com o *:
+    index = config.index('*')
     for quadrante  in lista_quadrantes:
-        index = config.index('*')
         aux = list(config)
+        # Troca as pecas de lugar:
         aux[quadrante], aux[index] = aux[index], aux[quadrante]
         config_adj = "".join(aux)
+        # Depois de muitas manipulacoes, adiciona a nova config na lista de configs adjs:
         lista_adjacentes.append(config_adj)
     print("Config original: ",config)
     print("Configs adjacentes: ",lista_adjacentes)
-    ...
+    # Retorna a lista de configs adjacentes:
+    return lista_adjacentes
 
 
-def calculaChaveHash(config) -> str:
+def calculaChaveHash(config):
     '''
         Funcao que retorna a chave hash para uma configuracao.
     '''
@@ -65,10 +73,10 @@ def incluiNoGrafoEstado(config, hashtable, grafo):
 
 def criaGrafoEstados(config_inicial):
     '''
-        1. Verifica quem são as posições adjacentes à posição vazia ('*')
-        2. Formar novos nós
-        3. Para cada nó
-            3.1. Verifica se já existe no grafo por meio da função de hash
+        1. Verifica quem sao as posicoes adjacentes a posicao vazia ('*')
+        2. Formar novos nos
+        3. Para cada no
+            3.1. Verifica se ja existe no grafo por meio da funcao de hash
                 3.1.1. Se nao existe, adiciona-o no grafo
                 3.1.2. Chama a funcao recursivamente para este no?????????????????
     '''
