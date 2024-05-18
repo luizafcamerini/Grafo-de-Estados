@@ -1,4 +1,10 @@
 from itertools import permutations
+from collections import deque
+
+
+def calculaChaveHash(config):
+    return str(hash(config))
+
 
 def calculaQuadrantesAdj(posicao):
     '''
@@ -40,26 +46,46 @@ def calculaConfigsAdj(config):
 
 
 def criaGrafoEstados(permutacoes):
+    '''
+        Para cada permutação possivel do tabuleiro:
+            1. Adiciona ela no grafo;
+            2. Calcula seus vizinhos e adiciona na lista de adjacências;
+            3. Aumenta o número de arestas;
+    '''
     numArestas = 0
     grafo = {}
-    '''
-        Para cada permutação
-            1. Adiciona ela no grafo
-            2. Calcula seus vizinhos e adiciona na lista de adjacências
-            3. Aumenta o número de arestas
-    '''
     for perm in permutacoes:
-        # Calcula os vizinhos desta permutação:
         vizinhos = calculaConfigsAdj(perm)
-        # Adiciona 
         grafo[perm] = vizinhos
-        numArestas += len(vizinhos)/2
+        numArestas += len(vizinhos) / 2
+        
     return grafo, int(numArestas)
 
 
+def BFS(grafo):
+    visitados = set()
+    numComponentes = 0
+    for no in grafo:
+        if no not in visitados:
+            BFSVisit(grafo, no, visitados)
+            numComponentes += 1
+    return numComponentes
+
+
+def BFSVisit(grafo, origem, visitados):
+    camadas = deque([origem])
+    while camadas:
+        inicio = camadas.popleft()
+        for vizinho in grafo[inicio]:
+            if vizinho not in visitados:
+                visitados.add(vizinho)
+                camadas.append(vizinho)
+
+
 configInicial = "12345678*"
-permutacoes = list(permutations(configInicial))
+permutacoes = ["".join(perm) for perm in permutations(configInicial)]
 numeroNos = len(permutacoes)
 grafo, numeroArestas = criaGrafoEstados(permutacoes)
 print("Numero de nos: \t\t",numeroNos)
 print("Numero de arestas: \t",numeroArestas)
+print("Componentes conexos: ", BFS(grafo))
