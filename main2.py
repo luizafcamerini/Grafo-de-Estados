@@ -1,17 +1,12 @@
 from itertools import permutations
 from collections import deque
 
-
-def calculaChaveHash(config):
-    return str(hash(config))
-
-
 def calculaQuadrantesAdj(posicao):
     '''
         Funcao que, dado um quadrante do tabuleiro, retorna todos os quadrantes adjacentes 
         ao mesmo dentro do vetor de config.
     ''' 
-    quadrante = posicao + 1 # => o quadrante do tabuleiro eh a posicao do vetor + 1
+    quadrante = posicao + 1 # -> o quadrante do tabuleiro eh a posicao do vetor + 1
     match (quadrante):
         case 1: return [1, 3]
         case 2: return [0, 4, 2]
@@ -47,10 +42,10 @@ def calculaConfigsAdj(config):
 
 def criaGrafoEstados(permutacoes):
     '''
-        Para cada permutação possivel do tabuleiro:
+        Para cada permutacao possivel do tabuleiro:
             1. Adiciona ela no grafo;
-            2. Calcula seus vizinhos e adiciona na lista de adjacências;
-            3. Aumenta o número de arestas;
+            2. Calcula seus vizinhos e adiciona na lista de adjacencias;
+            3. Aumenta o numero de arestas;
     '''
     numArestas = 0
     grafo = {}
@@ -63,6 +58,9 @@ def criaGrafoEstados(permutacoes):
 
 
 def BFS(grafo):
+    '''
+        Funcao que roda a BFS em um grafo e retorna quantos componentes conexos o grafo possui.
+    '''
     visitados = set()
     numComponentes = 0
     for no in grafo:
@@ -73,19 +71,46 @@ def BFS(grafo):
 
 
 def BFSVisit(grafo, origem, visitados):
+    '''
+        Funcao que realiza a visitacao dos nos na sequencia de BFS.
+        Retorna o numero de movimentos feitos.
+    '''
+    parents = dict()
     camadas = deque([origem])
+    ultimoVisitado = origem
     while camadas:
-        inicio = camadas.popleft()
-        for vizinho in grafo[inicio]:
+        no = camadas.popleft()
+        for vizinho in grafo[no]:
             if vizinho not in visitados:
                 visitados.add(vizinho)
+                ultimoVisitado = vizinho
                 camadas.append(vizinho)
+                parents[vizinho] = str()
+                parents[vizinho] += no
+    return ultimoVisitado, parents
+
+
+def BFSMaisLongo(grafo, config):
+    '''
+        Funcao que roda a BFS e computa o caminho mais longo dado uma configuracao final.
+        Retorna a quantidade de movimentos.
+    '''
+    movimentos = 0
+    visitados = set()
+    ultimoVisitado, parents = BFSVisit(grafo, config, visitados)
+    print("Configuracao inicial viavel: ",ultimoVisitado)
+    # Faz o caminho contrario pelos parents, ate chegar na config final:
+    while ultimoVisitado != config:
+        ultimoVisitado = parents[ultimoVisitado]
+        movimentos += 1
+    return movimentos
 
 
 configInicial = "12345678*"
 permutacoes = ["".join(perm) for perm in permutations(configInicial)]
 numeroNos = len(permutacoes)
 grafo, numeroArestas = criaGrafoEstados(permutacoes)
-print("Numero de nos: \t\t",numeroNos)
-print("Numero de arestas: \t",numeroArestas)
-print("Componentes conexos: ", BFS(grafo))
+print("Numero de nos: \t\t", numeroNos)
+print("Numero de arestas: \t", numeroArestas)
+print("Componentes conexos: \t", BFS(grafo))
+print("Movimentos requeridos: ",BFSMaisLongo(grafo, configInicial))
